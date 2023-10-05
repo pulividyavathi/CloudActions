@@ -1,0 +1,41 @@
+name: Test DB connection
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+      MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+    strategy:
+      matrix:
+        node-version:
+          - 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: CloudAssignments/package-lock.json
+      - name: Start MySQL
+        run: |
+          sudo systemctl start mysql
+          systemctl status mysql
+      - name: Create Database
+        run: |
+          sudo mysql --user=${{ secrets.MYSQL_USERNAME }} --password=${{ secrets.MYSQL_PASSWORD }} -e "create database ${{ secrets.DATABASE_NAME }}"
+      - name: Install Dependencies
+        run: |
+          cd CloudAssignments
+          npm install
+      - name: Run Tests
+        run: |
+          cd CloudAssignments 
+          npm test
