@@ -11,7 +11,7 @@ app.use((req, res, next) => {
 
 const userRoute=require('./routes/userRoute')
 const assignmentRoute=require('./routes/assignmentRoute')
-const PORT=process.env.PORT
+const PORT=8080
 
 app.use(cors());
 app.use(express.json())
@@ -91,4 +91,4 @@ sequelize
 // 		   console.log(`Node api app is running on ${PORT}`)
 // 		})
 
-module.exports={app}
+module.exports=app

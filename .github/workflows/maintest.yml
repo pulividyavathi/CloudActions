@@ -1,0 +1,42 @@
+name: Test DB connection
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_NAME: 'csye6225'
+      MYSQL_USERNAME: 'root'
+      MYSQL_PASSWORD: 'Writecode@123'
+      DB_HOST: 'localhost'
+    ports:
+       - 3306:3306
+    strategy:
+      matrix:
+        node-version:
+          - 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Start MySQL
+        run: |
+          sudo systemctl start mysql
+          systemctl status mysql
+      - name: Create Database
+        run: |
+          sudo mysql --user='root' --password='Writecode@123' -e "create database 'csye6225'"
+      - name: Install Dependencies
+        run: |
+
+          npm install
+      - name: Run Tests
+        run: |
+
+          npm test

@@ -1,40 +1,51 @@
-name: Node.js CI
+name: CI
 
 on:
   push:
     branches:
-      - master
-  pull_request:
-    branches:
-      - master
+      - main  # Change to your main branch name
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: Writecode@123
+          MYSQL_DATABASE: hcsye6225ealth
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          node-version: 14
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm install
 
-      - name: Build (if present)
-        run: npm run build --if-present
+      - name: Wait for MySQL to be ready
+        run: |
+          until nc -z localhost 3306; do
+            sleep 1
+          done
+      - name: Debug MySQL Container
+        run: docker logs ${{ job.services.mysql.id }}
 
-      - name: Start MySQL with Docker Compose
-        run: docker-compose up -d biddify-product-database
-
-      - name: Sleep for 120 seconds
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '120s'
-
-      - name: Run Tests
+      - name: Create GitHub Actions MySQL User and Grant Privileges
+        run: |
+          mysql -h 127.0.0.1 -u root -p6068 -e "CREATE USER 'vidya'@'172.18.0.1' IDENTIFIED BY 'Writecode@123';"
+          mysql -h 127.0.0.1 -u root -p6068 -e "GRANT ALL PRIVILEGES ON health.* TO 'vidya'@'172.18.0.1';"
+          mysql -h 127.0.0.1 -u root -p6068 -e "FLUSH PRIVILEGES;"
+      - name: Run tests
         run: npm test
+
+      - name: Stop MySQL container
+        run: docker stop ${{ job.services.mysql.id }}
