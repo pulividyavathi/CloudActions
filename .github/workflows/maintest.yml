@@ -11,6 +11,8 @@ jobs:
       MYSQL_USERNAME: 'root'
       MYSQL_PASSWORD: 'Writecode@123'
       DB_HOST: 'localhost'
+    ports:
+       - 3306:3306
     strategy:
       matrix:
         node-version:
@@ -32,9 +34,9 @@ jobs:
           sudo mysql --user='root' --password='Writecode@123' -e "create database 'csye6225'"
       - name: Install Dependencies
         run: |
-          cd CloudAssignments
+
           npm install
       - name: Run Tests
         run: |
-          cd CloudAssignments 
+
           npm test
