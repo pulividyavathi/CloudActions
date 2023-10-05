@@ -1,117 +1,53 @@
 name: Node.js CI
 
-'on':
-
+on:
   pull_request:
-
     branches:
-
       - main
 
 jobs:
-
   build-and-test:
-
     runs-on: ubuntu-latest
 
     services:
-
       postgres:
-
         image: 'postgres:latest'
-
         env:
-
           POSTGRES_DB: 'webapp'
-
           POSTGRES_USER: 'postgres'
-
           POSTGRES_PASSWORD: 'password'
-
-          POSTGRES_PORT: '5432'
-
-          POSTGRES_HOST: 'localhost'
-
-          DB_DIALECT: 'postgres'
-
         ports:
-
           - '5432:5432'
-
         options: >-
-
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
           --health-retries 5
 
     steps:
-
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Use Node.js 20.6
-
-        uses: actions/setup-node@v3
-
+        uses: actions/setup-node@v2
         with:
-
           node-version: 20.6
-
           cache: 'npm'
 
- 
-
-      - name:  env file
-
+      - name: Create .env file
         run: |
-
-          touch .env
-
- 
-
           echo PGDATABASE=webapp >> .env
-
- 
-
           echo PGUSER=postgres >> .env
-
- 
-
           echo PGPASSWORD=password >> .env
-
- 
-
           echo PGPORT=5432 >> .env
-
- 
-
           echo PGHOST=localhost >> .env
-
           echo DB_DIALECT=postgres >> .env
 
- 
+      - name: Display .env file
+        run: cat .env
 
-          echo "cat .env"
-
- 
-
-          cat .env
-
- 
-
-          echo "ls -a ."
-
- 
-
-          ls -a .
-
-      - name: Install ALL dependencies
-
+      - name: Install Dependencies
         run: npm install
 
- 
-
-      - name: Run tests
-
+      - name: Run Tests
         run: npm test
-
- 
