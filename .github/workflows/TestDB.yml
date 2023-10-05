@@ -1,0 +1,30 @@
+name: Test Database Connectivity
+
+on: [push]
+
+jobs:
+  test-database-connectivity:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Test Database Connectivity
+      env:
+        DB_NAME: "csye6225"
+        DB_USERNAME: "root"
+        DB_PASSWORD: "Writecode@123"
+        DB_HOST: "localhost"
+        DB_PORT: 3306   
+      run: |
+        echo "Testing database connectivity..."
+        node test-database-connectivity.js   
