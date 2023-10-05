@@ -1,42 +1,117 @@
 name: Node.js CI
 
-on:
-  push:
-    branches:
-      - main
+'on':
+
   pull_request:
+
     branches:
+
       - main
 
 jobs:
-  build:
+
+  build-and-test:
+
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    services:
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      postgres:
+
+        image: 'postgres:latest'
+
+        env:
+
+          POSTGRES_DB: 'webapp'
+
+          POSTGRES_USER: 'postgres'
+
+          POSTGRES_PASSWORD: 'password'
+
+          POSTGRES_PORT: '5432'
+
+          POSTGRES_HOST: 'localhost'
+
+          DB_DIALECT: 'postgres'
+
+        ports:
+
+          - '5432:5432'
+
+        options: >-
+
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+
+          --health-retries 5
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 20.6
+
+        uses: actions/setup-node@v3
+
         with:
-          node-version: ${{ matrix.node-version }}
+
+          node-version: 20.6
+
           cache: 'npm'
 
-      - name: Install Dependencies
+ 
+
+      - name:  env file
+
+        run: |
+
+          touch .env
+
+ 
+
+          echo PGDATABASE=webapp >> .env
+
+ 
+
+          echo PGUSER=postgres >> .env
+
+ 
+
+          echo PGPASSWORD=password >> .env
+
+ 
+
+          echo PGPORT=5432 >> .env
+
+ 
+
+          echo PGHOST=localhost >> .env
+
+          echo DB_DIALECT=postgres >> .env
+
+ 
+
+          echo "cat .env"
+
+ 
+
+          cat .env
+
+ 
+
+          echo "ls -a ."
+
+ 
+
+          ls -a .
+
+      - name: Install ALL dependencies
+
         run: npm install
 
-      - name: Build (if present)
-        run: npm run build --if-present
+ 
 
-      - name: Start MySQL with Docker Compose
-        run: docker-compose up -d biddify-product-database
+      - name: Run tests
 
-      - name: Sleep for 120 seconds
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '120s'
-
-      - name: Run Tests
         run: npm test
-             echo "test"
 
+ 
