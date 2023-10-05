@@ -1,53 +1,51 @@
-name: Node.js CI
+name: CI
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - main  # Change to your main branch name
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
-        image: 'postgres:latest'
+      mysql:
+        image: mysql:latest
         env:
-          POSTGRES_DB: 'webapp'
-          POSTGRES_USER: 'postgres'
-          POSTGRES_PASSWORD: 'password'
+          MYSQL_ROOT_PASSWORD: Writecode@123
+          MYSQL_DATABASE: hcsye6225ealth
         ports:
-          - '5432:5432'
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Use Node.js 20.6
+      - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 20.6
-          cache: 'npm'
+          node-version: 14
 
-      - name: Create .env file
-        run: |
-          echo PGDATABASE=webapp >> .env
-          echo PGUSER=postgres >> .env
-          echo PGPASSWORD=password >> .env
-          echo PGPORT=5432 >> .env
-          echo PGHOST=localhost >> .env
-          echo DB_DIALECT=postgres >> .env
-
-      - name: Display .env file
-        run: cat .env
-
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm install
 
-      - name: Run Tests
+      - name: Wait for MySQL to be ready
+        run: |
+          until nc -z localhost 3306; do
+            sleep 1
+          done
+      - name: Debug MySQL Container
+        run: docker logs ${{ job.services.mysql.id }}
+
+      - name: Create GitHub Actions MySQL User and Grant Privileges
+        run: |
+          mysql -h 127.0.0.1 -u root -p6068 -e "CREATE USER 'vidya'@'172.18.0.1' IDENTIFIED BY 'Writecode@123';"
+          mysql -h 127.0.0.1 -u root -p6068 -e "GRANT ALL PRIVILEGES ON health.* TO 'vidya'@'172.18.0.1';"
+          mysql -h 127.0.0.1 -u root -p6068 -e "FLUSH PRIVILEGES;"
+      - name: Run tests
         run: npm test
+
+      - name: Stop MySQL container
+        run: docker stop ${{ job.services.mysql.id }}
