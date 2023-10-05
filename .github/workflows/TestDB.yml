@@ -30,4 +30,4 @@ jobs:
         DB_PORT: 3306   
       run: |
         echo "Testing database connectivity..."
-        node test-database-connectivity.js   
+        node test_db_local.js   

@@ -4,7 +4,7 @@
   "description": "Node Express Sequelize API",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --exit test.js",
+    "test": "mocha test/test.js",
     "dev": "nodemon server.js"
   },
   "author": "node express SQL",
@@ -20,6 +20,7 @@
     "jsonwebtoken": "^9.0.2",
     "logger": "^0.0.1",
     "mysql": "^2.18.1",
+    "mysql2": "^3.6.1",
     "nodemon": "^3.0.1",
     "postgres": "^3.3.5",
     "sequelize": "^6.33.0",
