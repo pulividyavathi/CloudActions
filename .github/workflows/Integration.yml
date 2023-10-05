@@ -1,4 +1,4 @@
-name: Integration Test
+name: CI/CD test
 
 on:
   pull_request:
@@ -8,7 +8,6 @@ on:
 jobs:
   integration-test:
     runs-on: ubuntu-latest
-
     services:
       mysql:
         image: mysql:latest
@@ -17,12 +16,7 @@ jobs:
           MYSQL_DATABASE: 'csye6225'
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
