@@ -23,7 +23,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          cache-dependency-path: CloudAssignments/package-lock.json
       - name: Start MySQL
         run: |
           sudo systemctl start mysql
