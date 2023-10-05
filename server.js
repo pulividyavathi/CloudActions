@@ -91,4 +91,4 @@ sequelize
 // 		   console.log(`Node api app is running on ${PORT}`)
 // 		})
 
-module.exports={app}
+module.exports=app

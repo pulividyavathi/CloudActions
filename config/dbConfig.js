@@ -12,7 +12,7 @@
 // // );
 
 // // module.exports = sequelize;
-const { Sequelize } = require('sequelize');
+ const { Sequelize } = require('sequelize');
 
 // module.exports = new Sequelize(
 //   process.env.DB_NAME,
@@ -23,8 +23,8 @@ const { Sequelize } = require('sequelize');
 //     dialect: 'mysql',  
 //   }
 // );
-const Sequelize = new Sequelize('csye6225', 'root', 'Writecode@123', {
+const sequelize = new Sequelize('csye6225', 'root', 'Writecode@123', {
   host: 'localhost',
   dialect: 'mysql'
 });
-module.exports = Sequelize
+module.exports = sequelize
