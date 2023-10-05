@@ -1,23 +1,40 @@
-name: test
+name: Node.js CI
 
 on:
   push:
     branches:
-      - main # Change this to your desired branch name
+      - master
   pull_request:
     branches:
-      - main # Change this to your desired branch name
+      - master
 
 jobs:
-  job_push:
+  build:
     runs-on: ubuntu-latest
-    steps:
-      - name: Push Event
-        run: echo This is the job for a push event.
 
-  job_pull_request:
-    runs-on: ubuntu-latest
     steps:
-      - name: Pull Request Event
-        run: echo This is the job for a pull request event.
+      - name: Checkout code
+        uses: actions/checkout@v2
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build (if present)
+        run: npm run build --if-present
+
+      - name: Start MySQL with Docker Compose
+        run: docker-compose up -d biddify-product-database
+
+      - name: Sleep for 120 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '120s'
+
+      - name: Run Tests
+        run: npm test
